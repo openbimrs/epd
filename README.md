@@ -96,7 +96,8 @@ crate package. Legally accessed references can be kept under the ignored local
 
 ## Development
 
-Requires Rust `1.85` or newer.
+Requires Rust `1.85` or newer, Python 3, and Node.js. Node.js is used only to
+syntax-check generated JavaScript before it enters the Pages archive.
 
 ```bash
 git clone https://github.com/openbimrs/epd.git
@@ -108,8 +109,10 @@ python -m pip install -r docs/requirements.txt
 
 The gate checks formatting, build, tests, Clippy, rustdoc, and crates.io package
 verification using command exit codes. The documentation build assembles the
-site under `target/site/` and fails if required pages, generated API files, or
-reference-leakage checks fail.
+site under `target/site/`, rejects symlinked ancestry, non-regular paths,
+unexpected locations, and malformed content, then verifies local links before
+creating the exact checked Pages upload at
+`target/pages-artifact.tar` from an immutable content snapshot.
 
 ## Contributing
 

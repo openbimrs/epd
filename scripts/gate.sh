@@ -6,6 +6,8 @@ cd "$(dirname "$0")/.."
 
 cargo fmt --all -- --check
 python3 -m py_compile scripts/check-docs-site.py
+python3 -m py_compile scripts/test-docs-security.py
+python3 scripts/test-docs-security.py
 bash -n scripts/build-docs.sh
 cargo build --workspace --all-targets --locked
 cargo test --workspace --all-features --locked

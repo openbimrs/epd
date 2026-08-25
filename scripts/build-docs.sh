@@ -5,6 +5,7 @@ repo_root=$(cd "$(dirname "$0")/.." && pwd)
 docs_source="$repo_root/target/docs-source"
 site_dir="$repo_root/target/site"
 rust_target="$repo_root/target/docs-rust"
+pages_archive="$repo_root/target/pages-artifact.tar"
 
 for path in "$docs_source" "$site_dir" "$rust_target"; do
   case "$path" in
@@ -17,6 +18,7 @@ for path in "$docs_source" "$site_dir" "$rust_target"; do
 done
 
 rm -rf "$docs_source" "$site_dir" "$rust_target"
+rm -f "$pages_archive"
 mkdir -p "$docs_source/assets/stylesheets"
 
 install -m 0644 "$repo_root/README.md" "$docs_source/index.md"
@@ -41,7 +43,9 @@ RUSTDOCFLAGS="-D warnings" cargo doc \
 
 mkdir -p "$site_dir/api"
 cp -R "$rust_target/doc/." "$site_dir/api/"
+install -m 0644 "$repo_root/docs/rustdoc-index.html" "$site_dir/api/index.html"
 touch "$site_dir/.nojekyll"
 
-python3 "$repo_root/scripts/check-docs-site.py" "$site_dir"
+python3 "$repo_root/scripts/check-docs-site.py" "$site_dir" "$pages_archive"
 printf 'documentation site built at %s\n' "$site_dir"
+printf 'verified Pages archive built at %s\n' "$pages_archive"

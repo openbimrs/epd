@@ -13,7 +13,9 @@ support as implemented without executable conformance evidence.
 - `mkdocs.yml` — GitHub Pages navigation and theme configuration
 - `references/schema/` — ignored local standards material; only the parent README is tracked
 - `scripts/gate.sh` — complete local/CI verification gate
-- `scripts/build-docs.sh` — assembles MkDocs prose and generated rustdoc API
+- `scripts/build-docs.sh` — assembles MkDocs prose, rustdoc, and the checked upload archive
+- `scripts/check-docs-site.py` — symlink-free, positive-content site verifier and archive builder
+- `scripts/test-docs-security.py` — mutation-sensitive Pages boundary tests
 - `CHANGELOG.md` — user-visible changes using Keep a Changelog
 
 ## Commands
@@ -25,6 +27,8 @@ cargo package -p openbim-epd
 python -m pip install -r docs/requirements.txt
 ./scripts/build-docs.sh
 ```
+
+The documentation checker uses Node.js to syntax-check generated JavaScript.
 
 Trust command exit codes. Never summarize a Cargo pipeline in a way that hides
 the Cargo process status.

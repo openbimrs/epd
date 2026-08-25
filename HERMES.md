@@ -15,7 +15,11 @@ success from command exit codes.
 
 Run `./scripts/build-docs.sh` after installing `docs/requirements.txt` when
 changing public documentation. It assembles the MkDocs site and rustdoc API in
-`target/site/`; GitHub Pages publishes that exact artifact.
+`target/site/`, opens every supplied path component without following symlinks,
+positively validates every generated content type, and creates the exact GitHub
+Pages upload archive at `target/pages-artifact.tar`. It also verifies generated
+local links and packages an immutable descriptor-backed content snapshot rather
+than reopening validated paths. Node.js is required for JavaScript syntax checks.
 
 ## Project conventions
 

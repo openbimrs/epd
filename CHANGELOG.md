@@ -12,6 +12,18 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Added an automated GitHub Pages site with generated Rust API documentation
   and single-source architecture, roadmap, and changelog pages.
 
+### Security
+
+- Hardened Pages publication to reject symlinks in every supplied path
+  component, hard links, filesystem-boundary crossings, post-validation path
+  substitution, and unexpected artifact types or malformed generated content;
+  deployment now uploads the exact verified tar archive and manual runs can
+  deploy only from `main`.
+- Added generated-site local-link verification and a rustdoc API landing page so
+  every published rustdoc navigation target resolves inside the artifact.
+- Added positive validators for every allowed generated asset type and require
+  `.nojekyll` and rustdoc's `.lock` marker to remain empty.
+
 ## [0.1.1] - 2026-08-25
 
 ### Fixed
