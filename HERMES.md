@@ -23,6 +23,8 @@ local links and packages an immutable descriptor-backed content snapshot rather
 than reopening validated paths. Node.js is required for JavaScript syntax checks.
 CI uses the same `upload-artifact` version as the official Pages composite, but
 uploads this prebuilt tar so no action independently traverses the site tree.
+Required tar directory entries are derived only from validated snapshot names;
+the archive builder never reopens the generated site.
 
 ## Project conventions
 

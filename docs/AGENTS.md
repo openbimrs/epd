@@ -11,8 +11,9 @@ The build packages only positively validated regular files into
 required by `deploy-pages`. The checker opens
 every supplied site-path component without following symlinks, snapshots file
 content through pinned directory descriptors, and verifies local links before
-packaging. It uses Node.js to syntax-check JavaScript. Keep its artifact
-type/path allowlist narrow when generated tooling changes.
+packaging. Required archive directory entries are derived from snapshot names,
+not another filesystem traversal. It uses Node.js to syntax-check JavaScript.
+Keep its artifact type/path allowlist narrow when generated tooling changes.
 
 Keep architecture statements synchronized with executable Cargo boundaries and
 CI behavior. Do not copy restricted standards text, schemas, PDFs, or workbooks

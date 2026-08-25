@@ -516,34 +516,91 @@ def check_local_links(files: dict[str, bytes]) -> None:
         fail(f"broken local links: {shown}{suffix}")
 
 
+def archive_directories(file_names: set[str] | dict[str, object]) -> set[str]:
+    directories = {"."}
+    for file_name in file_names:
+        parent = PurePosixPath(file_name).parent
+        while parent.as_posix() != ".":
+            directories.add(parent.as_posix())
+            parent = parent.parent
+    return directories
+
+
+def archive_member_path(member_name: str) -> str:
+    if member_name == ".":
+        return "."
+    if member_name == "./.":
+        fail("archive root member must be named exactly .")
+    if not member_name.startswith("./"):
+        fail(f"archive member does not use the required ./ root: {member_name}")
+    relative = member_name[2:]
+    path = PurePosixPath(relative)
+    if (
+        not relative
+        or path.is_absolute()
+        or ".." in path.parts
+        or "\\" in member_name
+        or path.as_posix() != relative
+    ):
+        fail(f"unsafe archive member path: {member_name}")
+    return relative
+
+
+def validate_archive_metadata(member: tarfile.TarInfo, expected_mode: int) -> None:
+    if member.mode != expected_mode:
+        fail(f"archive member has unexpected mode: {member.name}")
+    if member.mtime != 0:
+        fail(f"archive member has unexpected mtime: {member.name}")
+    if member.uid != 0 or member.gid != 0 or member.uname or member.gname:
+        fail(f"archive member has unexpected ownership metadata: {member.name}")
+    if member.linkname:
+        fail(f"archive member has an unexpected link target: {member.name}")
+    if member.pax_headers:
+        fail(f"archive member has unexpected PAX metadata: {member.name}")
+
+
 def verify_archive(archive: Path, expected_hashes: dict[str, str]) -> None:
-    seen: dict[str, str] = {}
+    expected_directories = archive_directories(expected_hashes)
+    seen_files: dict[str, str] = {}
+    seen_directories: set[str] = set()
     with tarfile.open(archive, "r:") as packaged:
         for member in packaged.getmembers():
-            path = PurePosixPath(member.name)
-            if path.is_absolute() or ".." in path.parts or "\\" in member.name:
-                fail(f"unsafe archive member path: {member.name}")
-            normalized = path.as_posix()
-            if normalized in seen:
+            normalized = archive_member_path(member.name)
+            if normalized in seen_files or normalized in seen_directories:
                 fail(f"duplicate archive member: {normalized}")
+            if member.isdir():
+                if normalized not in expected_directories or member.size != 0:
+                    fail(f"unexpected archive directory: {normalized}")
+                validate_archive_metadata(member, 0o755)
+                seen_directories.add(normalized)
+                continue
             if not member.isfile():
-                fail(f"archive member is not a regular file: {normalized}")
+                fail(f"archive member is neither a regular file nor directory: {normalized}")
+            if normalized == ".":
+                fail("archive root member is not a directory")
+            if normalized not in expected_hashes:
+                fail(f"unexpected archive file: {normalized}")
+            validate_archive_metadata(member, 0o644)
             extracted = packaged.extractfile(member)
             if extracted is None:
                 fail(f"archive member could not be read: {normalized}")
-            seen[normalized] = hashlib.sha256(extracted.read()).hexdigest()
+            seen_files[normalized] = hashlib.sha256(extracted.read()).hexdigest()
 
-    if seen != expected_hashes:
-        missing = sorted(set(expected_hashes) - set(seen))
-        extra = sorted(set(seen) - set(expected_hashes))
-        changed = sorted(
-            name
-            for name in set(seen) & set(expected_hashes)
-            if seen[name] != expected_hashes[name]
+    missing_directories = sorted(expected_directories - seen_directories)
+    if missing_directories:
+        fail(
+            "archive directory topology differs from Pages contract: "
+            f"missing={missing_directories}"
         )
+
+    missing_files = sorted(set(expected_hashes) - set(seen_files))
+    changed_files = sorted(
+        name for name in seen_files if seen_files[name] != expected_hashes[name]
+    )
+    if missing_files or changed_files:
         fail(
             "archive differs from validated site snapshot: "
-            f"missing={missing}, extra={extra}, changed={changed}"
+            f"missing={missing_files}, changed={changed_files}"
         )
 
 
@@ -560,8 +617,22 @@ def create_archive(files: dict[str, bytes], archive_argument: str | Path) -> Pat
     hashes: dict[str, str] = {}
     try:
         with tarfile.open(temporary, "w", format=tarfile.PAX_FORMAT) as output:
+            directories = archive_directories(files)
+            for directory in sorted(directories, key=lambda item: (item != ".", item)):
+                archive_name = "." if directory == "." else f"./{directory}"
+                info = tarfile.TarInfo(archive_name)
+                info.type = tarfile.DIRTYPE
+                info.size = 0
+                info.mode = 0o755
+                info.mtime = 0
+                info.uid = 0
+                info.gid = 0
+                info.uname = ""
+                info.gname = ""
+                output.addfile(info)
+
             for relative, payload in sorted(files.items()):
-                info = tarfile.TarInfo(relative)
+                info = tarfile.TarInfo(f"./{relative}")
                 info.size = len(payload)
                 info.mode = 0o644
                 info.mtime = 0

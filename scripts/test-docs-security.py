@@ -81,25 +81,45 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         self.assertIn(expected_message, result.stderr)
         self.assertFalse(self.archive.exists())
 
-    def test_packages_only_verified_regular_files(self) -> None:
+    @staticmethod
+    def add_archive_root(packaged: tarfile.TarFile, name: str = ".") -> None:
+        root = tarfile.TarInfo(name)
+        root.type = tarfile.DIRTYPE
+        root.mode = 0o755
+        packaged.addfile(root)
+
+    def test_packages_only_verified_files_and_directories(self) -> None:
         result = self.run_checker(package=True)
         self.assertEqual(result.returncode, 0, result.stderr)
 
         with tarfile.open(self.archive, "r:") as packaged:
             members = packaged.getmembers()
         self.assertTrue(members)
-        self.assertTrue(all(member.isfile() for member in members))
+        self.assertTrue(all(member.isfile() or member.isdir() for member in members))
+        for member in members:
+            self.assertEqual(member.mode, 0o755 if member.isdir() else 0o644)
+            self.assertEqual(member.mtime, 0)
+            self.assertEqual((member.uid, member.gid), (0, 0))
+            self.assertEqual((member.uname, member.gname, member.linkname), ("", "", ""))
+            self.assertEqual(member.pax_headers, {})
         self.assertEqual(
             {member.name for member in members},
             {
-                ".nojekyll",
-                "api/index.html",
-                "api/openbim_epd/index.html",
-                "architecture/index.html",
-                "changelog/index.html",
-                "index.html",
-                "roadmap/index.html",
-                "search/search_index.json",
+                ".",
+                "./.nojekyll",
+                "./api",
+                "./api/index.html",
+                "./api/openbim_epd",
+                "./api/openbim_epd/index.html",
+                "./architecture",
+                "./architecture/index.html",
+                "./changelog",
+                "./changelog/index.html",
+                "./index.html",
+                "./roadmap",
+                "./roadmap/index.html",
+                "./search",
+                "./search/search_index.json",
             },
         )
 
@@ -192,7 +212,7 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
 
         CHECKER_MODULE.create_archive(snapshot, self.archive)
         with tarfile.open(self.archive, "r:") as packaged:
-            packaged_file = packaged.extractfile("api/openbim_epd/index.html")
+            packaged_file = packaged.extractfile("./api/openbim_epd/index.html")
             self.assertIsNotNone(packaged_file)
             self.assertEqual(packaged_file.read(), expected)
 
@@ -208,8 +228,11 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         CHECKER_MODULE.create_archive(snapshot, self.archive)
         with tarfile.open(self.archive, "r:") as packaged:
             names = {member.name for member in packaged.getmembers()}
-        self.assertEqual(names, set(snapshot))
-        self.assertNotIn("api/restricted.pdf", names)
+        expected_names = {"."}
+        expected_names.update(f"./{directory}" for directory in CHECKER_MODULE.archive_directories(snapshot) if directory != ".")
+        expected_names.update(f"./{relative}" for relative in snapshot)
+        self.assertEqual(names, expected_names)
+        self.assertNotIn("./api/restricted.pdf", names)
 
     def test_rejects_symlinked_site_ancestor(self) -> None:
         real_parent = self.root / "real-parent"
@@ -267,27 +290,163 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
     def test_archive_path_safety_is_enforced(self) -> None:
         payload = b"validated"
         with tarfile.open(self.archive, "w") as packaged:
-            member = tarfile.TarInfo("../escape")
+            member = tarfile.TarInfo("./../escape")
             member.size = len(payload)
             packaged.addfile(member, io.BytesIO(payload))
         expected = {"../escape": hashlib.sha256(payload).hexdigest()}
         with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "unsafe archive member path"):
             CHECKER_MODULE.verify_archive(self.archive, expected)
 
-    def test_archive_regular_file_type_is_enforced(self) -> None:
+    def test_archive_root_spelling_is_exact(self) -> None:
+        with tarfile.open(self.archive, "w") as packaged:
+            self.add_archive_root(packaged, "./.")
+        with self.assertRaisesRegex(
+            CHECKER_MODULE.ArtifactError,
+            "archive root member must be named exactly",
+        ):
+            CHECKER_MODULE.verify_archive(self.archive, {})
+
+    def test_archive_rejects_duplicate_missing_and_extra_members(self) -> None:
+        payload = b"validated"
+        digest = hashlib.sha256(payload).hexdigest()
+
+        with self.subTest(case="duplicate-root"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+                self.add_archive_root(packaged)
+            with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "duplicate archive member"):
+                CHECKER_MODULE.verify_archive(self.archive, {})
+
+        with self.subTest(case="duplicate-file"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+                for _ in range(2):
+                    member = tarfile.TarInfo("./target")
+                    member.size = len(payload)
+                    packaged.addfile(member, io.BytesIO(payload))
+            with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "duplicate archive member"):
+                CHECKER_MODULE.verify_archive(self.archive, {"target": digest})
+
+        with self.subTest(case="duplicate-nested-directory"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+                for _ in range(2):
+                    directory = tarfile.TarInfo("./nested")
+                    directory.type = tarfile.DIRTYPE
+                    directory.mode = 0o755
+                    packaged.addfile(directory)
+                member = tarfile.TarInfo("./nested/target")
+                member.size = len(payload)
+                packaged.addfile(member, io.BytesIO(payload))
+            with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "duplicate archive member"):
+                CHECKER_MODULE.verify_archive(self.archive, {"nested/target": digest})
+
+        with self.subTest(case="missing-file"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+            with self.assertRaisesRegex(
+                CHECKER_MODULE.ArtifactError,
+                "archive differs from validated site snapshot",
+            ):
+                CHECKER_MODULE.verify_archive(self.archive, {"target": digest})
+
+        with self.subTest(case="extra-file"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+                member = tarfile.TarInfo("./extra")
+                member.size = len(payload)
+                packaged.addfile(member, io.BytesIO(payload))
+            with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "unexpected archive file"):
+                CHECKER_MODULE.verify_archive(self.archive, {})
+
+        with self.subTest(case="extra-directory"):
+            with tarfile.open(self.archive, "w") as packaged:
+                self.add_archive_root(packaged)
+                directory = tarfile.TarInfo("./extra")
+                directory.type = tarfile.DIRTYPE
+                directory.mode = 0o755
+                packaged.addfile(directory)
+            with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "unexpected archive directory"):
+                CHECKER_MODULE.verify_archive(self.archive, {})
+
+    def test_archive_requires_pages_root_prefix(self) -> None:
         payload = b"validated"
         with tarfile.open(self.archive, "w") as packaged:
+            self.add_archive_root(packaged)
             member = tarfile.TarInfo("target")
             member.size = len(payload)
             packaged.addfile(member, io.BytesIO(payload))
-            link = tarfile.TarInfo("alias")
-            link.type = tarfile.SYMTYPE
-            link.linkname = "target"
-            packaged.addfile(link)
-        digest = hashlib.sha256(payload).hexdigest()
-        expected = {"target": digest, "alias": digest}
-        with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, "not a regular file"):
+        expected = {"target": hashlib.sha256(payload).hexdigest()}
+        with self.assertRaisesRegex(
+            CHECKER_MODULE.ArtifactError,
+            "archive member does not use the required ./ root",
+        ):
             CHECKER_MODULE.verify_archive(self.archive, expected)
+
+    def test_archive_directory_topology_is_enforced(self) -> None:
+        payload = b"validated"
+        with tarfile.open(self.archive, "w") as packaged:
+            self.add_archive_root(packaged)
+            member = tarfile.TarInfo("./api/target")
+            member.size = len(payload)
+            packaged.addfile(member, io.BytesIO(payload))
+        expected = {"api/target": hashlib.sha256(payload).hexdigest()}
+        with self.assertRaisesRegex(
+            CHECKER_MODULE.ArtifactError,
+            "archive directory topology differs from Pages contract",
+        ):
+            CHECKER_MODULE.verify_archive(self.archive, expected)
+
+    def test_archive_metadata_is_deterministic(self) -> None:
+        cases = (
+            ("mode", "mode", 0o700, "unexpected mode"),
+            ("mtime", "mtime", 1, "unexpected mtime"),
+            ("uid", "uid", 1, "unexpected ownership metadata"),
+            ("gid", "gid", 1, "unexpected ownership metadata"),
+            ("uname", "uname", "owner", "unexpected ownership metadata"),
+            ("gname", "gname", "group", "unexpected ownership metadata"),
+            ("linkname", "linkname", "target", "unexpected link target"),
+            ("pax", "pax_headers", {"comment": "forbidden"}, "unexpected PAX metadata"),
+        )
+        for case, attribute, value, diagnostic in cases:
+            with self.subTest(case=case):
+                with tarfile.open(self.archive, "w", format=tarfile.PAX_FORMAT) as packaged:
+                    root = tarfile.TarInfo(".")
+                    root.type = tarfile.DIRTYPE
+                    root.mode = 0o755
+                    setattr(root, attribute, value)
+                    packaged.addfile(root)
+                with self.assertRaisesRegex(CHECKER_MODULE.ArtifactError, diagnostic):
+                    CHECKER_MODULE.verify_archive(self.archive, {})
+
+    def test_archive_non_file_types_are_rejected(self) -> None:
+        payload = b"validated"
+        digest = hashlib.sha256(payload).hexdigest()
+        member_types = (
+            tarfile.SYMTYPE,
+            tarfile.LNKTYPE,
+            tarfile.CHRTYPE,
+            tarfile.BLKTYPE,
+            tarfile.FIFOTYPE,
+        )
+        for member_type in member_types:
+            with self.subTest(member_type=member_type):
+                with tarfile.open(self.archive, "w") as packaged:
+                    self.add_archive_root(packaged)
+                    member = tarfile.TarInfo("./target")
+                    member.size = len(payload)
+                    packaged.addfile(member, io.BytesIO(payload))
+                    alias = tarfile.TarInfo("./alias")
+                    alias.type = member_type
+                    if member_type in (tarfile.SYMTYPE, tarfile.LNKTYPE):
+                        alias.linkname = "./target"
+                    packaged.addfile(alias)
+                expected = {"target": digest, "alias": digest}
+                with self.assertRaisesRegex(
+                    CHECKER_MODULE.ArtifactError,
+                    "neither a regular file nor directory",
+                ):
+                    CHECKER_MODULE.verify_archive(self.archive, expected)
 
     def test_workflow_uploads_checked_archive_only_from_main(self) -> None:
         workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -296,18 +455,26 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         ]
         self.assertEqual(condition_lines, [DEPLOY_CONDITION, DEPLOY_CONDITION])
         stripped_lines = [line.strip() for line in workflow.splitlines()]
-        self.assertIn("path: target/artifact.tar", workflow)
-        self.assertNotIn("path: target/pages-artifact.tar", workflow)
+        self.assertEqual(
+            [line for line in stripped_lines if line.startswith("path:")],
+            ["path: target/artifact.tar"],
+        )
         self.assertEqual(stripped_lines.count("name: github-pages"), 2)
         self.assertEqual(stripped_lines.count("needs: build"), 1)
         self.assertNotIn("actions/upload-pages-artifact@", workflow)
-        self.assertIn(
-            "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
-            workflow,
+        self.assertEqual(
+            [line for line in stripped_lines if "upload-artifact@" in line],
+            [
+                "uses: actions/upload-artifact@"
+                "ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2"
+            ],
         )
-        self.assertIn(
-            "actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128",
-            workflow,
+        self.assertEqual(
+            [line for line in stripped_lines if "deploy-pages@" in line],
+            [
+                "uses: actions/deploy-pages@"
+                "cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0"
+            ],
         )
 
 

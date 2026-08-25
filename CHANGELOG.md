@@ -14,9 +14,9 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Use the required `artifact.tar` member name and the uploader version bundled
-  by the official Pages composite so `deploy-pages` accepts the
-  repository-generated archive.
+- Use the required `artifact.tar` member name, rooted file/directory topology,
+  and uploader version bundled by the official Pages composite so
+  `deploy-pages` accepts the repository-generated archive.
 
 ### Security
 

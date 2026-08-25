@@ -113,7 +113,8 @@ site under `target/site/`, rejects symlinked ancestry, non-regular paths,
 unexpected locations, and malformed content, then verifies local links before
 creating the exact checked Pages upload at
 `target/artifact.tar` from an immutable content snapshot. The filename is part
-of the `deploy-pages` artifact contract.
+of the `deploy-pages` artifact contract; its rooted directory topology is
+derived from the validated snapshot without reopening the site tree.
 
 ## Contributing
 
