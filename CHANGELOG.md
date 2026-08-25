@@ -12,6 +12,11 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Added an automated GitHub Pages site with generated Rust API documentation
   and single-source architecture, roadmap, and changelog pages.
 
+### Fixed
+
+- Use the required `artifact.tar` member name for the checked Pages upload so
+  `deploy-pages` accepts the repository-generated archive.
+
 ### Security
 
 - Hardened Pages publication to reject symlinks in every supplied path

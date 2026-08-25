@@ -296,7 +296,8 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         ]
         self.assertEqual(condition_lines, [DEPLOY_CONDITION, DEPLOY_CONDITION])
         stripped_lines = [line.strip() for line in workflow.splitlines()]
-        self.assertIn("path: target/pages-artifact.tar", workflow)
+        self.assertIn("path: target/artifact.tar", workflow)
+        self.assertNotIn("path: target/pages-artifact.tar", workflow)
         self.assertEqual(stripped_lines.count("name: github-pages"), 2)
         self.assertEqual(stripped_lines.count("needs: build"), 1)
         self.assertNotIn("actions/upload-pages-artifact@", workflow)

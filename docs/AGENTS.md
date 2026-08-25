@@ -7,7 +7,8 @@ rustdoc. Root `README.md`, `ROADMAP.md`, and `CHANGELOG.md` remain canonical and
 are copied into a temporary source tree by `scripts/build-docs.sh`.
 
 The build packages only positively validated regular files into
-`target/pages-artifact.tar`; CI uploads that exact archive. The checker opens
+`target/artifact.tar`; CI uploads that exact archive using the tar-member name
+required by `deploy-pages`. The checker opens
 every supplied site-path component without following symlinks, snapshots file
 content through pinned directory descriptors, and verifies local links before
 packaging. It uses Node.js to syntax-check JavaScript. Keep its artifact

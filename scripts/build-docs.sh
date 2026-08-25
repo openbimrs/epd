@@ -5,7 +5,7 @@ repo_root=$(cd "$(dirname "$0")/.." && pwd)
 docs_source="$repo_root/target/docs-source"
 site_dir="$repo_root/target/site"
 rust_target="$repo_root/target/docs-rust"
-pages_archive="$repo_root/target/pages-artifact.tar"
+pages_archive="$repo_root/target/artifact.tar"
 
 for path in "$docs_source" "$site_dir" "$rust_target"; do
   case "$path" in

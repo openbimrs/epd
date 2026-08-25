@@ -112,7 +112,8 @@ verification using command exit codes. The documentation build assembles the
 site under `target/site/`, rejects symlinked ancestry, non-regular paths,
 unexpected locations, and malformed content, then verifies local links before
 creating the exact checked Pages upload at
-`target/pages-artifact.tar` from an immutable content snapshot.
+`target/artifact.tar` from an immutable content snapshot. The filename is part
+of the `deploy-pages` artifact contract.
 
 ## Contributing
 
