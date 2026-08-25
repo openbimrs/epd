@@ -1,0 +1,12 @@
+[package]
+name = "openbim-epd"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+authors = ["point-grey"]
+repository = "https://github.com/openbimrs/epd"
+readme = "README.md"
+description = "ISO 22057 environmental product declaration data-template contracts."
+keywords = ["bim", "openbim", "epd", "lca", "sustainability"]
+categories = ["data-structures", "science"]

@@ -1,0 +1,12 @@
+/target
+**/*.rs.bk
+*.pdb
+.DS_Store
+*.swp
+.idea/
+.vscode/
+.hermes/
+
+# Locally accessed standards material is not redistributable by default.
+/references/*
+!/references/README.md
