@@ -1,6 +1,6 @@
 [package]
 name = "openbim-epd"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT"
@@ -10,3 +10,4 @@ readme = "README.md"
 description = "ISO 22057 environmental product declaration data-template contracts."
 keywords = ["bim", "openbim", "epd", "lca", "sustainability"]
 categories = ["data-structures", "science"]
+exclude = ["AGENTS.md", "PLAN.md"]

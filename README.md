@@ -14,7 +14,7 @@ pins it under `packages/epd`.
 
 ## Status
 
-The `0.1.0` release is a **reserved scaffold**, not an EPD parser, writer, or
+The `0.1.1` release is a **reserved scaffold**, not an EPD parser, writer, or
 validator.
 
 | Capability | Status |
@@ -57,11 +57,14 @@ cargo add openbim-epd
 ```
 
 ```rust
-use openbim_epd::{InformationModule, LifeCycleStage, StandardEdition};
+use openbim_epd::{InformationModule, InformationModuleGroup, StandardEdition};
 
 assert_eq!(StandardEdition::CURRENT.designation(), "ISO 22057:2022");
 assert_eq!(InformationModule::A1.code(), "A1");
-assert_eq!(InformationModule::D.stage(), LifeCycleStage::BeyondSystemBoundary);
+assert_eq!(
+    InformationModule::D.group(),
+    InformationModuleGroup::BeyondSystemBoundary
+);
 ```
 
 ## Architecture

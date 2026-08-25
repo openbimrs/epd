@@ -20,6 +20,19 @@
 //! writing, validation, data-template exchange, and format-specific adapters are
 //! not implemented.
 //!
+//! # Examples
+//!
+//! ```
+//! use openbim_epd::{InformationModule, InformationModuleGroup, StandardEdition};
+//!
+//! assert_eq!(StandardEdition::CURRENT.designation(), "ISO 22057:2022");
+//! assert_eq!(InformationModule::A1ToA3.code(), "A1-A3");
+//! assert_eq!(
+//!     InformationModule::D.group(),
+//!     InformationModuleGroup::BeyondSystemBoundary
+//! );
+//! ```
+//!
 //! # Repository boundary
 //!
 //! EPD consumes shared data-template and, eventually, IFC contracts. IFC, core,
@@ -213,7 +226,7 @@ mod tests {
     }
 
     #[test]
-    fn lifecycle_modules_are_complete_and_round_trip() {
+    fn information_modules_are_complete_and_round_trip() {
         const EXPECTED_CODES: [&str; 18] = [
             "A1", "A2", "A3", "A1-A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "C1",
             "C2", "C3", "C4", "D",
@@ -230,7 +243,7 @@ mod tests {
     }
 
     #[test]
-    fn lifecycle_modules_map_to_their_groups() {
+    fn information_modules_map_to_their_groups() {
         assert_eq!(
             InformationModule::A1.group(),
             InformationModuleGroup::Product

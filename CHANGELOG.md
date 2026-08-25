@@ -7,6 +7,16 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-25
+
+### Fixed
+
+- Corrected public examples to use `InformationModuleGroup` and `group()` so
+  module D is not presented as a life-cycle stage.
+- Added a compile-tested crate example and excluded internal agent planning
+  files from the published package.
+- Pinned CI actions to immutable commits and made Cargo gate operations locked.
+
 ## [0.1.0] - 2026-08-25
 
 ### Added
@@ -19,5 +29,6 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Added standalone documentation, CI, package verification, and explicit
   format-boundary guidance.
 
-[Unreleased]: https://github.com/openbimrs/epd/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/openbimrs/epd/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/openbimrs/epd/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/openbimrs/epd/releases/tag/v0.1.0

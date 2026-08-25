@@ -5,7 +5,7 @@ Rust.
 
 ## Status
 
-**Reserved scaffold.** Version `0.1.0` does not parse, write, or validate EPD
+**Reserved scaffold.** Version `0.1.1` does not parse, write, or validate EPD
 datasets. It currently provides:
 
 - an explicit ISO 22057:2022 edition contract;
@@ -25,11 +25,11 @@ before relying on a feature.
 ## Example
 
 ```rust
-use openbim_epd::{InformationModule, LifeCycleStage, StandardEdition};
+use openbim_epd::{InformationModule, InformationModuleGroup, StandardEdition};
 
 assert_eq!(StandardEdition::CURRENT.designation(), "ISO 22057:2022");
 assert_eq!(InformationModule::B7.code(), "B7");
-assert_eq!(InformationModule::C4.stage(), LifeCycleStage::EndOfLife);
+assert_eq!(InformationModule::C4.group(), InformationModuleGroup::EndOfLife);
 assert_eq!(InformationModule::from_code("A0"), None);
 ```
 
