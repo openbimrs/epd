@@ -16,9 +16,13 @@ contracts into conformance-tested behavior.
 
 ```bash
 ./scripts/gate.sh
+python -m pip install -r docs/requirements.txt
+./scripts/build-docs.sh
 ```
 
-7. Update README capability status, rustdoc, and `CHANGELOG.md` for user-visible behavior.
+7. Update README capability status, rustdoc, `ROADMAP.md`, and `CHANGELOG.md` for
+   user-visible behavior. Pages copies those canonical files; do not maintain
+   parallel changelog or roadmap documents under `docs/`.
 
 ## Conformance work
 

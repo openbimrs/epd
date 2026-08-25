@@ -56,7 +56,7 @@ These types do not imply an EPD dataset model, parser, writer, or validator.
 ## Standards artifacts
 
 This repository does not vendor ISO/CEN documents or annex workbooks. Local
-references stay under ignored `references/`. A fixture can be committed only
+references stay under ignored `references/schema/`. A fixture can be committed only
 when its redistribution terms are known and compatible with the repository
 license and intended use.
 

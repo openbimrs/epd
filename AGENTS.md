@@ -9,8 +9,11 @@ support as implemented without executable conformance evidence.
 
 - `openbim-epd/` — canonical published crate; read its `AGENTS.md` before editing
 - `docs/` — architecture and maintained documentation
-- `references/` — ignored local standards material; only its README is tracked
+- `ROADMAP.md` — canonical public capability roadmap
+- `mkdocs.yml` — GitHub Pages navigation and theme configuration
+- `references/schema/` — ignored local standards material; only the parent README is tracked
 - `scripts/gate.sh` — complete local/CI verification gate
+- `scripts/build-docs.sh` — assembles MkDocs prose and generated rustdoc API
 - `CHANGELOG.md` — user-visible changes using Keep a Changelog
 
 ## Commands
@@ -19,6 +22,8 @@ support as implemented without executable conformance evidence.
 ./scripts/gate.sh
 cargo test --workspace
 cargo package -p openbim-epd
+python -m pip install -r docs/requirements.txt
+./scripts/build-docs.sh
 ```
 
 Trust command exit codes. Never summarize a Cargo pipeline in a way that hides
@@ -38,5 +43,7 @@ the Cargo process status.
 
 ## Documentation discipline
 
-Keep capability tables honest. Update README, rustdoc, and CHANGELOG together
-for user-visible changes.
+Keep capability tables honest. Update README, rustdoc, `ROADMAP.md`, and
+`CHANGELOG.md` together for user-visible changes. Pages copies root canonical
+files into its generated source tree; do not create parallel changelog or
+roadmap copies under `docs/`.

@@ -13,6 +13,10 @@ standalone development.
 Run `./scripts/gate.sh`. It is the authoritative local and CI gate and decides
 success from command exit codes.
 
+Run `./scripts/build-docs.sh` after installing `docs/requirements.txt` when
+changing public documentation. It assembles the MkDocs site and rustdoc API in
+`target/site/`; GitHub Pages publishes that exact artifact.
+
 ## Project conventions
 
 - Rust 2021, MSRV 1.85, MIT.
@@ -21,6 +25,7 @@ success from command exit codes.
 - ISO 22057 does not define one XML schema. Do not invent a namespace or imply
   that a format-specific parser is ISO 22057 itself.
 - Do not vendor standards documents or annex workbooks without confirmed
-  redistribution rights. Local material belongs under ignored `references/`.
+  redistribution rights. Local material belongs under ignored
+  `references/schema/`.
 - Use Keep a Changelog and distinguish implemented, reserved, and
   conformance-tested capabilities.

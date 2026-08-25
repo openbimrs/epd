@@ -7,6 +7,10 @@ This is task state, not ambient context. Follow `AGENTS.md`; claim one task ID,
 record blockers and decisions under it, and check it off only with executable
 evidence.
 
+The public, capability-oriented roadmap is maintained at `../ROADMAP.md` from
+the repository root and published by GitHub Pages. Keep this implementation
+queue consistent with that roadmap.
+
 ## Established boundary
 
 ISO 22057 defines EPD data-template information and mappings, not a universal

@@ -5,6 +5,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 cargo fmt --all -- --check
+python3 -m py_compile scripts/check-docs-site.py
+bash -n scripts/build-docs.sh
 cargo build --workspace --all-targets --locked
 cargo test --workspace --all-features --locked
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings

@@ -7,6 +7,11 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added an automated GitHub Pages site with generated Rust API documentation
+  and single-source architecture, roadmap, and changelog pages.
+
 ## [0.1.1] - 2026-08-25
 
 ### Fixed
