@@ -302,7 +302,7 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         self.assertEqual(stripped_lines.count("needs: build"), 1)
         self.assertNotIn("actions/upload-pages-artifact@", workflow)
         self.assertIn(
-            "actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f",
+            "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
             workflow,
         )
         self.assertIn(

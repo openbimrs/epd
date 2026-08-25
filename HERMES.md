@@ -21,6 +21,8 @@ Pages upload archive at `target/artifact.tar`; `deploy-pages` requires that exac
 tar-member filename. The build also verifies generated
 local links and packages an immutable descriptor-backed content snapshot rather
 than reopening validated paths. Node.js is required for JavaScript syntax checks.
+CI uses the same `upload-artifact` version as the official Pages composite, but
+uploads this prebuilt tar so no action independently traverses the site tree.
 
 ## Project conventions
 
