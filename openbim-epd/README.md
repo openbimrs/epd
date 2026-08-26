@@ -5,14 +5,17 @@ Rust.
 
 ## Status
 
-**Reserved scaffold.** Version `0.1.1` does not parse, write, or validate EPD
-datasets. It currently provides:
+The published `0.1.1` release is a reserved scaffold. Current unreleased `main`
+remains format-neutral and provides:
 
 - an explicit ISO 22057:2022 edition contract;
 - all 18 EPD information-module codes, including the aggregated `A1-A3` value;
 - exact code lookup and semantic grouping, with D explicitly beyond the
   product-system boundary;
-- unit tests for those contracts.
+- composition with the canonical `openbim-dt` ISO 23387 data-template contract;
+- unit and cross-crate contract tests.
+
+This core crate does not parse, write, or validate exchange formats.
 
 ISO 22057 defines EPD data-template information and mappings, not a universal
 XML namespace or XSD. This crate deliberately does not invent one. Format

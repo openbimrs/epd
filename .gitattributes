@@ -1,0 +1,2 @@
+# Preserve exact upstream ILCD+EPD sample bytes; SHA256SUMS verifies integrity.
+openbim-ilcd-epd/tests/fixtures/upstream-v1.3/**/*.xml -text -whitespace

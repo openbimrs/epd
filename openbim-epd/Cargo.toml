@@ -11,3 +11,6 @@ description = "ISO 22057 environmental product declaration data-template contrac
 keywords = ["bim", "openbim", "epd", "lca", "sustainability"]
 categories = ["data-structures", "science"]
 exclude = ["AGENTS.md", "PLAN.md"]
+
+[dependencies]
+openbim-dt = "0.2.0"

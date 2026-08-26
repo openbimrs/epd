@@ -13,11 +13,14 @@ registry dependencies rather than paths into sibling repositories.
 ## Dependency direction
 
 ```text
-codec/core  <-  data templates / IFC  <-  EPD
-                                      \
-openbim facade  ----------------------> EPD
+openbim-dt  <-  openbim-epd  <-  openbim-ilcd-epd
+IFC/core    <-  openbim-epd
+openbim facade  ----------------------------> EPD family
 ```
 
+- `openbim-epd` composes the released `openbim-dt` ISO 23387 contracts.
+- `openbim-ilcd-epd` depends on the core EPD vocabulary and a direct maintained
+  XML parser; provider wire policy remains in the adapter.
 - EPD may use released data-template and public IFC contracts.
 - IFC, core, codec, and data-template substrate crates must never depend on EPD.
 - The `openbim` facade may optionally re-export EPD.
@@ -31,10 +34,16 @@ ISO 22057:2022 defines EPD data-template information. It does not standardize a
 single wire encoding, XML namespace, or XSD. Annex B maps information to more
 than one established external format.
 
-The architecture therefore has two separate future responsibilities:
+The architecture therefore has two separate responsibilities:
 
-1. a format-neutral ISO 22057 domain model;
+1. a format-neutral ISO 22057 domain model composed from `openbim-dt` ISO 23387
+   contracts;
 2. explicit adapters, each named and versioned for its actual format.
+
+`openbim-ilcd-epd` is the first adapter. Its v1.3 parser retains exact original
+bytes and extracts a deliberately small typed view; this supports unmodified
+round trips but does not claim editing, writing, XSD validation, ZIP support, or
+complete ISO 22057 mapping.
 
 An ILCD+EPD, INIES, EC3/openEPD, or other adapter must not leak its element names,
 identifiers, cardinality quirks, or version assumptions into the domain model.
@@ -56,9 +65,11 @@ These types do not imply an EPD dataset model, parser, writer, or validator.
 ## Standards artifacts
 
 This repository does not vendor ISO/CEN documents or annex workbooks. Local
-references stay under ignored `references/schema/`. A fixture can be committed only
+references stay under ignored `references/specs/`. A fixture can be committed only
 when its redistribution terms are known and compatible with the repository
-license and intended use.
+license and intended use. The tracked ILCD+EPD fixture mirror is limited to XML
+from the Apache-2.0 upstream sample corpus, records its exact source commit, and
+is excluded from published crate packages.
 
 ## Cross-repository delivery
 

@@ -36,7 +36,7 @@ python3 -m mkdocs build \
 
 RUSTDOCFLAGS="-D warnings" cargo doc \
   --manifest-path "$repo_root/Cargo.toml" \
-  --package openbim-epd \
+  --workspace \
   --no-deps \
   --locked \
   --target-dir "$rust_target"
@@ -44,6 +44,7 @@ RUSTDOCFLAGS="-D warnings" cargo doc \
 mkdir -p "$site_dir/api"
 cp -R "$rust_target/doc/." "$site_dir/api/"
 install -m 0644 "$repo_root/docs/rustdoc-index.html" "$site_dir/api/index.html"
+install -m 0644 "$repo_root/LICENSE" "$site_dir/LICENSE.txt"
 touch "$site_dir/.nojekyll"
 
 python3 "$repo_root/scripts/check-docs-site.py" "$site_dir" "$pages_archive"

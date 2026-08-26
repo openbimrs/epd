@@ -12,7 +12,7 @@ import sys
 import tarfile
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -48,6 +48,7 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
             "changelog/index.html",
             "api/index.html",
             "api/openbim_epd/index.html",
+            "api/openbim_ilcd_epd/index.html",
         ):
             path = self.site / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -55,6 +56,7 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         search = self.site / "search/search_index.json"
         search.parent.mkdir(parents=True)
         search.write_text("{}", encoding="utf-8")
+        (self.site / "LICENSE.txt").write_bytes((ROOT / "LICENSE").read_bytes())
         (self.site / ".nojekyll").touch()
 
     def tearDown(self) -> None:
@@ -107,10 +109,13 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
             {
                 ".",
                 "./.nojekyll",
+                "./LICENSE.txt",
                 "./api",
                 "./api/index.html",
                 "./api/openbim_epd",
                 "./api/openbim_epd/index.html",
+                "./api/openbim_ilcd_epd",
+                "./api/openbim_ilcd_epd/index.html",
                 "./architecture",
                 "./architecture/index.html",
                 "./changelog",
@@ -163,6 +168,14 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         path = self.site / "api/restricted.html"
         path.write_bytes(b"%PDF-1.7\nrestricted")
         self.assert_rejected("restricted binary signature")
+
+    def test_requires_exact_project_license(self) -> None:
+        license_path = self.site / "LICENSE.txt"
+        license_path.unlink()
+        self.assert_rejected("missing required outputs: LICENSE.txt")
+
+        license_path.write_text("MIT-ish", encoding="utf-8")
+        self.assert_rejected("published project license does not match repository LICENSE")
 
     def test_requires_nojekyll(self) -> None:
         (self.site / ".nojekyll").unlink()
@@ -251,6 +264,12 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
         (self.site / "api/index.html").unlink()
         self.assert_rejected("missing required outputs: api/index.html")
 
+    def test_requires_adapter_api_landing_page(self) -> None:
+        (self.site / "api/openbim_ilcd_epd/index.html").unlink()
+        self.assert_rejected(
+            "missing required outputs: api/openbim_ilcd_epd/index.html"
+        )
+
     def test_requires_empty_marker_files(self) -> None:
         (self.site / ".nojekyll").write_text("confidential", encoding="utf-8")
         self.assert_rejected("marker file must be empty: .nojekyll")
@@ -281,6 +300,20 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
                     path.unlink()
                 else:
                     path.write_bytes(original)
+
+    def test_allows_exact_second_crate_rustdoc_outputs(self) -> None:
+        allowed = (
+            "api/openbim_ilcd_epd/sidebar-items.js",
+            "api/search.desc/openbim_ilcd_epd/openbim_ilcd_epd-desc-0-.js",
+            "api/static.files/FiraMono-Medium-12345678.woff2",
+            "api/static.files/FiraSans-Italic-12345678.woff2",
+            "api/static.files/SourceSerif4-Semibold-12345678.ttf.woff2",
+        )
+        for relative in allowed:
+            with self.subTest(relative=relative):
+                self.assertTrue(
+                    CHECKER_MODULE.is_allowed_api_file(PurePosixPath(relative))
+                )
 
     def test_rejects_unknown_api_javascript_path(self) -> None:
         path = self.site / "api/restricted.js"

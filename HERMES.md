@@ -30,11 +30,13 @@ the archive builder never reopens the generated site.
 
 - Rust 2021, MSRV 1.85, MIT.
 - Pure Rust; unsafe code is forbidden.
-- EPD consumes data-template/IFC contracts; those lower layers never depend on EPD.
+- `openbim-epd` composes the canonical `openbim-dt` ISO 23387 contract already
+  consumed by LOIN; lower layers never depend on EPD.
+- ILCD+EPD wire policy belongs only in `openbim-ilcd-epd`.
 - ISO 22057 does not define one XML schema. Do not invent a namespace or imply
   that a format-specific parser is ISO 22057 itself.
 - Do not vendor standards documents or annex workbooks without confirmed
   redistribution rights. Local material belongs under ignored
-  `references/schema/`.
+  `references/specs/`.
 - Use Keep a Changelog and distinguish implemented, reserved, and
   conformance-tested capabilities.

@@ -15,10 +15,11 @@
 //!
 //! # Status
 //!
-//! **Reserved scaffold.** The standard edition and all 18 EPD information-module
-//! codes (including aggregated `A1-A3`) are represented and tested. EPD parsing,
-//! writing, validation, data-template exchange, and format-specific adapters are
-//! not implemented.
+//! **Format-neutral foundation.** The standard edition, all 18 EPD
+//! information-module codes (including aggregated `A1-A3`), and composition
+//! with the shared ISO 23387 [`openbim_dt::DataTemplate`] are represented and
+//! tested. This core crate does not parse, write, or validate exchange formats;
+//! versioned adapters such as `openbim-ilcd-epd` remain separate packages.
 //!
 //! # Examples
 //!
@@ -59,6 +60,50 @@ impl StandardEdition {
         match self {
             Self::Iso22057_2022 => "ISO 22057:2022",
         }
+    }
+}
+
+/// An ISO 22057 EPD template composed from the ISO 23387 vocabulary.
+///
+/// ISO 22057 specializes BIM data-template concepts; it does not own a second
+/// property, unit, quantity-kind, or object-type model. Keeping the underlying
+/// [`openbim_dt::DataTemplate`] intact gives EPD and LOIN the same type identity
+/// without making either standard depend on the other.
+///
+/// This type is format-neutral. It does not imply ILCD+EPD XML, provider API,
+/// or Annex A conformance.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EpdDataTemplate {
+    standard: StandardEdition,
+    data_template: openbim_dt::DataTemplate,
+}
+
+impl EpdDataTemplate {
+    /// Binds an ISO 23387 data template to the current ISO 22057 edition.
+    #[must_use]
+    pub const fn new(data_template: openbim_dt::DataTemplate) -> Self {
+        Self {
+            standard: StandardEdition::CURRENT,
+            data_template,
+        }
+    }
+
+    /// The ISO 22057 edition governing this EPD template.
+    #[must_use]
+    pub const fn standard(&self) -> StandardEdition {
+        self.standard
+    }
+
+    /// The shared ISO 23387 data-template contract.
+    #[must_use]
+    pub const fn data_template(&self) -> &openbim_dt::DataTemplate {
+        &self.data_template
+    }
+
+    /// Consumes the EPD binding and returns the shared ISO 23387 template.
+    #[must_use]
+    pub fn into_data_template(self) -> openbim_dt::DataTemplate {
+        self.data_template
     }
 }
 

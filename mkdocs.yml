@@ -14,7 +14,8 @@ nav:
   - Architecture: architecture.md
   - Roadmap: roadmap.md
   - Changelog: changelog.md
-  - Rust API: https://openbimrs.github.io/epd/api/openbim_epd/
+  - Core Rust API: https://openbimrs.github.io/epd/api/openbim_epd/
+  - ILCD+EPD Rust API: https://openbimrs.github.io/epd/api/openbim_ilcd_epd/
 
 theme:
   name: material

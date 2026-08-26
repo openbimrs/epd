@@ -1,8 +1,9 @@
 # openbim-epd instructions
 
-Purpose: ISO 22057 EPD data-template contracts and future explicit
-exchange-format adapters. Follow `../AGENTS.md`. Read `PLAN.md` for implementation
-or roadmap work; keep progress, blockers, and verification evidence there.
+Purpose: format-neutral ISO 22057 EPD data-template contracts. Explicit
+exchange-format adapters are sibling crates. Follow `../AGENTS.md`. Read `PLAN.md`
+for implementation or roadmap work; keep progress, blockers, and verification
+evidence there.
 
 ## Boundary
 
@@ -16,5 +17,6 @@ or roadmap work; keep progress, blockers, and verification evidence there.
 
 ## Status
 
-Reserved scaffold. Standard-edition and information-module contracts exist;
-parsing, writing, validation, template exchange, and format adapters do not.
+The standard edition, information modules, and composition with the canonical
+`openbim-dt` ISO 23387 contract are implemented. Parsing, writing, and format
+validation do not belong in this core crate; use an explicit sibling adapter.

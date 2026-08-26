@@ -32,12 +32,15 @@ REQUIRED = (
     "changelog/index.html",
     "api/index.html",
     "api/openbim_epd/index.html",
+    "api/openbim_ilcd_epd/index.html",
     "search/search_index.json",
+    "LICENSE.txt",
     ".nojekyll",
 )
 ROOT_FILES = {
     ".nojekyll",
     "404.html",
+    "LICENSE.txt",
     "index.html",
     "sitemap.xml",
     "sitemap.xml.gz",
@@ -48,6 +51,7 @@ PAGE_FILES = {
     "roadmap/index.html",
 }
 RUSTDOC_SPECIAL_FILES = {"api/.lock"}
+RUSTDOC_CRATES = {"openbim_epd", "openbim_ilcd_epd"}
 RUSTDOC_STATIC_PREFIXES = {
     "main",
     "scrape-examples",
@@ -59,7 +63,11 @@ RUSTDOC_STATIC_PREFIXES = {
 RUSTDOC_CSS_PREFIXES = {"normalize", "noscript", "rustdoc"}
 RUSTDOC_IMAGE_PREFIXES = {"favicon", "favicon-32x32", "rust-logo"}
 RUSTDOC_FONT_PREFIXES = {
+    "FiraMono-Medium",
+    "FiraMono-Regular",
+    "FiraSans-Italic",
     "FiraSans-Medium",
+    "FiraSans-MediumItalic",
     "FiraSans-Regular",
     "NanumBarunGothic",
     "SourceCodePro-It",
@@ -68,6 +76,7 @@ RUSTDOC_FONT_PREFIXES = {
     "SourceSerif4-Bold",
     "SourceSerif4-It",
     "SourceSerif4-Regular",
+    "SourceSerif4-Semibold",
 }
 RUSTDOC_LICENSE_PREFIXES = {
     "COPYRIGHT",
@@ -120,9 +129,21 @@ def is_allowed_api_file(path: PurePosixPath) -> bool:
         return True
     if relative in {"api/crates.js", "api/search-index.js", "api/src-files.js"}:
         return True
-    if relative == "api/openbim_epd/sidebar-items.js":
+    if (
+        len(path.parts) == 3
+        and path.parts[0] == "api"
+        and path.parts[1] in RUSTDOC_CRATES
+        and path.parts[2] == "sidebar-items.js"
+    ):
         return True
-    if re.fullmatch(r"api/search\.desc/openbim_epd/openbim_epd-desc-[0-9]+-\.js", relative):
+    search_description = re.fullmatch(
+        r"api/search\.desc/([^/]+)/([^/]+)-desc-[0-9]+-\.js", relative
+    )
+    if (
+        search_description is not None
+        and search_description.group(1) == search_description.group(2)
+        and search_description.group(1) in RUSTDOC_CRATES
+    ):
         return True
     if re.fullmatch(r"api/trait\.impl/(?:[^/]+/)+trait\.[A-Za-z0-9_]+\.js", relative):
         return True
@@ -448,6 +469,10 @@ def scan_site(site_argument: str) -> tuple[Path, dict[str, bytes]]:
     missing = [relative for relative in REQUIRED if relative not in files]
     if missing:
         fail("missing required outputs: " + ", ".join(missing))
+
+    expected_license = (Path(__file__).resolve().parent.parent / "LICENSE").read_bytes()
+    if files["LICENSE.txt"] != expected_license:
+        fail("published project license does not match repository LICENSE")
 
     for relative, markers in PAGE_MARKERS.items():
         html = files[relative].decode("utf-8")

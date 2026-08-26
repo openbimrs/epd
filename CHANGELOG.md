@@ -9,6 +9,18 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added the separate `openbim-ilcd-epd` crate with bounded, DTD-free parsing of
+  InData ILCD+EPD v1.3 process identity, multilingual names, and declared ISO
+  22057 information modules.
+- Added exact original-byte preservation for unmodified ILCD+EPD documents,
+  including unknown provider extensions.
+- Added an attributed XML-only mirror of all 45 files in the upstream v1.3
+  `sample_data` corpus; schemas, PDFs, logos, and other documents remain outside
+  tracked fixtures and crate packages.
+- Composed ISO 22057 EPD templates with the canonical `openbim-dt` ISO 23387
+  `DataTemplate` type already used by `openbim-loin`.
+- Documented the pinned local ILCD+EPD reference checkout and the ÖKOBAUDAT,
+  IBU.data, ECO Platform, and InData ecosystem scope.
 - Added an automated GitHub Pages site with generated Rust API documentation
   and single-source architecture, roadmap, and changelog pages.
 

@@ -16,7 +16,8 @@ pins it under `packages/epd`.
 ## Documentation
 
 - [Documentation home](https://openbimrs.github.io/epd/)
-- [Rust API reference](https://openbimrs.github.io/epd/api/openbim_epd/)
+- [Core Rust API](https://openbimrs.github.io/epd/api/openbim_epd/)
+- [ILCD+EPD adapter API](https://openbimrs.github.io/epd/api/openbim_ilcd_epd/)
 - [Roadmap](https://openbimrs.github.io/epd/roadmap/)
 - [Changelog](https://openbimrs.github.io/epd/changelog/)
 
@@ -26,21 +27,26 @@ canonical root Markdown files so their website versions cannot drift.
 
 ## Status
 
-The `0.1.1` release is a **reserved scaffold**, not an EPD parser, writer, or
-validator.
+The published `0.1.1` release is a **reserved scaffold**, not an EPD parser,
+writer, or validator. Current unreleased `main` adds a bounded, read-only
+ILCD+EPD v1.3 process adapter while retaining that strict capability boundary.
 
 | Capability | Status |
 | --- | --- |
 | ISO 22057:2022 edition contract | Implemented and unit-tested |
 | All 18 EPD information-module codes, including `A1-A3` | Implemented and unit-tested |
 | Semantic grouping (including D beyond the system boundary) | Implemented and unit-tested |
+| ISO 23387 data-template composition via `openbim-dt` | Implemented and contract-tested on unreleased `main` |
 | ISO 22057 XML parsing/writing | Not applicable: the standard defines no single XML serialization |
-| ILCD+EPD, INIES, or openEPD adapters | Not implemented |
-| EPD data-template model and validation | Not implemented |
+| ILCD+EPD v1.3 process XML parsing | Implemented on unreleased `main`; namespace/version gated and resource bounded |
+| Lossless ILCD+EPD round trip | Exact original bytes only for unmodified parsed documents |
+| ILCD+EPD editing/writing, XSD validation, ZIP packages, and provider APIs | Not implemented |
+| INIES or openEPD adapters | Not implemented |
+| Complete ISO 22057 Annex A model and validation | Not implemented |
 | IFC integration | Not implemented |
 
-No exchange-format or validation capability should be inferred from the crate
-existing on crates.io.
+No capability beyond the explicit rows above should be inferred from a crate
+existing on crates.io or from successful parsing of one format version.
 
 ## Why there is no `epd.xml` schema here
 
@@ -49,18 +55,35 @@ to existing practices. It does not assign a universal XML namespace or publish
 one normative XSD for all ISO 22057 datasets. Its mapping material covers more
 than one external format.
 
-The implementation will therefore keep the ISO 22057 domain model separate from
+The implementation therefore keeps the ISO 22057 domain model separate from
 versioned format adapters. Inventing an `ISO_22057` XML namespace would create a
 new private format while falsely presenting it as an ISO serialization.
+
+## ILCD+EPD ecosystem
+
+The adapter targets the public [InData ILCD+EPD data
+format](https://www.indata.network/data-format), not a provider-private API.
+ILCD+EPD is used in the data ecosystems named for this implementation:
+
+- [ÖKOBAUDAT](https://www.oekobaudat.de/);
+- [IBU.data](https://ibu-epd.com/en/ibu-data-start/), whose public description
+  identifies its downloadable XML as ILCD+EPD;
+- [ECO Platform](https://www.eco-platform.org/);
+- [InData](https://www.indata.network/), which governs the format.
+
+Provider use does not imply identical profiles, API terms, or redistribution
+rights. The adapter gates the InData wire version explicitly and preserves
+unknown provider extensions in the original byte snapshot.
 
 ## Crate
 
 | Crate | Purpose |
 | --- | --- |
-| [`openbim-epd`](ht...[truncated]
+| [`openbim-epd`](https://crates.io/crates/openbim-epd) | Format-neutral ISO 22057 contracts and ISO 23387 data-template composition |
+| `openbim-ilcd-epd` *(unreleased)* | Explicit, bounded ILCD+EPD v1.3 process XML adapter |
 
 The short `epd` crate name is owned by another crates.io publisher, so this
-project ships only the canonical `openbim-epd` name.
+project ships only canonical `openbim-*` names.
 
 ## Install
 
@@ -91,8 +114,11 @@ data-template substrate layers must never depend on EPD.
 ## Standards material
 
 No ISO/CEN document or annex workbook is distributed by this repository or the
-crate package. Legally accessed references can be kept under the ignored local
-`references/schema/` directory; possession does not establish redistribution rights.
+crate package. Legally accessed references remain under the ignored local
+`references/specs/` directory; possession does not establish redistribution
+rights. The public InData release can be cloned at the pinned path documented in
+[`references/README.md`](https://github.com/openbimrs/epd/blob/main/references/README.md), but its schemas and documents are
+still excluded from Git, crate packages, and Pages.
 
 ## Development
 

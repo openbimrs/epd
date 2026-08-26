@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["openbim-epd"]
+members = ["openbim-epd", "openbim-ilcd-epd"]
 
 [profile.release]
 opt-level = 3

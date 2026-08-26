@@ -14,12 +14,23 @@ Implemented and released:
 - module D represented as benefits and loads beyond the product-system boundary;
 - standalone Rust gates, API documentation, and OpenBIM facade integration.
 
+Implemented on unreleased `main`:
+
+- composition with the canonical `openbim-dt` ISO 23387 `DataTemplate` contract;
+- an explicit `openbim-ilcd-epd` v1.3 process XML adapter;
+- bounded, DTD-free parsing of process identity, multilingual names, and declared
+  ISO 22057 information modules;
+- exact original-byte preservation for unmodified parsed documents;
+- an attributed, XML-only 45-file fixture mirror from the pinned InData v1.3
+  release.
+
 Not implemented:
 
-- EPD dataset parsing or writing;
+- generic EPD dataset parsing or writing;
+- ILCD+EPD editing/writing, XSD validation, ZIP package handling, or provider APIs;
 - generic or provider-specific validation;
-- a complete ISO 22057 data-template model;
-- XML, JSON, ILCD+EPD, INIES, or openEPD adapters;
+- a complete ISO 22057 Annex A data-template model;
+- INIES or openEPD adapters;
 - IFC association behavior.
 
 ## Delivery principles
@@ -67,15 +78,27 @@ gate can reject a targeted defect.
 
 ### 4. Versioned provider adapters
 
+In progress:
+
+- ILCD+EPD v1.3 process XML: bounded parsing and exact unmodified-byte
+  preservation are implemented in the separate `openbim-ilcd-epd` crate.
+
+Next ILCD+EPD slices:
+
+- map additional v1.3 process fields to explicit ISO 22057 concepts;
+- add ZIP package topology and reference-integrity checks;
+- define editing/writing semantics without dropping unknown provider extensions;
+- add XSD/profile validation only when diagnostics identify the exact upstream
+  schema and profile version.
+
 Evaluate independently:
 
-- ILCD+EPD;
 - INIES;
 - openEPD/EC3;
 - other formats only when public specifications and fixtures permit verification.
 
 Each adapter receives its own capability table. Parsing support never implies
-writing, validation, conformance, or lossless round trips.
+writing, validation, conformance, or editable lossless round trips.
 
 ### 5. IFC integration
 
@@ -89,5 +112,5 @@ round trips for supported references.
 ## Standards material boundary
 
 Purchased or otherwise restricted standards files remain local under
-`references/schema/`. The documentation and release pipelines must never copy
+`references/specs/`. The documentation and release pipelines must never copy
 that directory into Git, crates, build artifacts, or GitHub Pages.

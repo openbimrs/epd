@@ -1,0 +1,17 @@
+[package]
+name = "openbim-ilcd-epd"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+authors = ["point-grey"]
+repository = "https://github.com/openbimrs/epd"
+readme = "README.md"
+description = "Explicit ILCD+EPD v1.3 XML adapter for openbim-epd."
+keywords = ["bim", "openbim", "epd", "ilcd", "xml"]
+categories = ["parser-implementations", "science"]
+exclude = ["AGENTS.md", "PLAN.md", "tests/**"]
+
+[dependencies]
+openbim-epd = { version = "0.1.1", path = "../openbim-epd" }
+roxmltree = { version = "0.21.1", default-features = false, features = ["std", "positions"] }
