@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify that each generated crate carries the exact project MIT notice."""
+"""Verify that each generated crate carries the exact project AGPL notice."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def main() -> None:
             if extracted is None or extracted.read() != PROJECT_LICENSE:
                 fail(f"{archive.name} license does not match repository LICENSE")
 
-    print(f"verified exact MIT notice in {len(PACKAGES)} crate archives")
+    print(f"verified exact AGPL-3.0-or-later license in {len(PACKAGES)} crate archives")
 
 
 if __name__ == "__main__":

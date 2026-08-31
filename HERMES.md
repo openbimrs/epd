@@ -28,7 +28,7 @@ the archive builder never reopens the generated site.
 
 ## Project conventions
 
-- Rust 2021, MSRV 1.85, MIT.
+- Rust 2021, MSRV 1.85, AGPL-3.0-or-later.
 - Pure Rust; unsafe code is forbidden.
 - `openbim-epd` composes the canonical `openbim-dt` ISO 23387 contract already
   consumed by LOIN; lower layers never depend on EPD.

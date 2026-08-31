@@ -149,4 +149,4 @@ conformance evidence and update the status table without overstating coverage.
 
 ## License
 
-MIT — see [`LICENSE`](https://github.com/openbimrs/epd/blob/main/LICENSE).
+AGPL-3.0-or-later — see [`LICENSE`](https://github.com/openbimrs/epd/blob/main/LICENSE).

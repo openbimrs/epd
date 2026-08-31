@@ -6,7 +6,7 @@ packages, except for this notice.
 Keep locally obtained standards material under `references/specs/`. ISO/CEN
 standards and their annex workbooks may be used to implement and verify source
 code, but possession does not establish permission to redistribute those files
-in this MIT-licensed repository.
+in this repository, which is licensed under AGPL-3.0-or-later.
 
 ## ILCD+EPD v1.3
 
