@@ -47,7 +47,7 @@ contracts without claiming that ISO 22057 defines this XML format.
 - Preserve all unknown XML bytes for lossless unmodified round trips.
 - Keep ILCD+EPD namespace/version rules in the adapter crate. The core crate
   remains provider- and serialization-neutral.
-- Maintain Rust 1.85 compatibility and direct maintained XML dependencies.
+- Maintain Rust 1.99 compatibility and direct maintained XML dependencies.
 
 ### Deferred coverage
 
@@ -108,7 +108,7 @@ validation without weakening the v1.3 namespace and version gates.
 
 ## Completion log
 
-The v1.3 slice is covered by the locked Rust 1.85 gate, exact upstream fixture
+The v1.3 slice is covered by the locked Rust 1.99 gate, exact upstream fixture
 checks, bounded-parser and shadowing regressions, mutation probes, package-license
 checks, and deterministic Pages-artifact validation. Editing, reconstructed XML
 serialization, XSD/provider-profile validation, ZIP handling, and complete Annex

@@ -4,7 +4,7 @@
 [![Documentation](https://github.com/openbimrs/epd/actions/workflows/pages.yml/badge.svg)](https://openbimrs.github.io/epd/)
 [![crates.io](https://img.shields.io/crates/v/openbim-epd.svg)](https://crates.io/crates/openbim-epd)
 [![docs.rs](https://docs.rs/openbim-epd/badge.svg)](https://docs.rs/openbim-epd)
-[![MSRV](https://img.shields.io/badge/MSRV-1.85-blue)](https://www.rust-lang.org)
+[![MSRV](https://img.shields.io/badge/MSRV-1.99-blue)](https://www.rust-lang.org)
 
 Pure-Rust contracts for using environmental product declaration (EPD) data in
 building information modelling, based on ISO 22057:2022.
@@ -122,7 +122,7 @@ still excluded from Git, crate packages, and Pages.
 
 ## Development
 
-Requires Rust `1.85` or newer, Python 3, and Node.js. Node.js is used only to
+Requires Rust `1.99` or newer, Python 3, and Node.js. Node.js is used only to
 syntax-check generated JavaScript before it enters the Pages archive.
 
 ```bash
