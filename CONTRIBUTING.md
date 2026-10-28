@@ -37,6 +37,22 @@ Use focused commits with imperative subjects. Cross-repository changes publish
 lower-level dependencies first and update the `openbimrs/openbim` submodule pin
 last.
 
+## Releasing
+
+Releases are published by `.github/workflows/release.yml` through crates.io
+trusted publishing; openbim-epd needs no token and no manual `cargo publish`
+(see below for openbim-ilcd-epd's first release). Bump the
+version(s), date the `CHANGELOG.md` section, merge to `main`, then push an
+annotated tag `v<version>` on that commit. The workflow checks that the tag is
+on `main` and matches the manifest and changelog, runs `scripts/gate.sh`, then
+publishes `openbim-epd` in the `crates.io` environment. Already-published versions
+are skipped, so a failed run can be re-run. crates.io trusts exactly the
+repository, the file name `release.yml` and the environment `crates.io`; keep
+all three. Run the workflow by hand with a tag name to rehearse (gate only).
+
+`openbim-ilcd-epd` is not published by the workflow yet: it has no trusted
+publisher until its first release, which is done by hand with a token.
+
 ## Licensing contributions
 
 OpenBIM.rs is dual-licensed: `AGPL-3.0-or-later OR LicenseRef-Commercial`
