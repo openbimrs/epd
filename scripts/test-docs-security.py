@@ -315,6 +315,32 @@ class DocumentationArtifactSecurityTests(unittest.TestCase):
                     CHECKER_MODULE.is_allowed_api_file(PurePosixPath(relative))
                 )
 
+    def test_allows_rustdoc_1_99_search_index_shards(self) -> None:
+        allowed = (
+            "api/search.index/root.js",
+            "api/search.index/3a1853af1d.js",
+            "api/search.index/desc/4a42e6da9f.js",
+            "api/search.index/generic_inverted_index/0123456789.js",
+            "api/static.files/stringdex-12345678.js",
+            "api/static.files/Fira-LICENSE-12345678.txt",
+        )
+        for relative in allowed:
+            with self.subTest(relative=relative):
+                self.assertTrue(
+                    CHECKER_MODULE.is_allowed_api_file(PurePosixPath(relative))
+                )
+        rejected = (
+            "api/search.index/secret/0123456789.js",
+            "api/search.index/desc/nested/0123456789.js",
+            "api/search.index/not-a-hash.js",
+            "api/search.index/0123456789.html.js",
+        )
+        for relative in rejected:
+            with self.subTest(relative=relative):
+                self.assertFalse(
+                    CHECKER_MODULE.is_allowed_api_file(PurePosixPath(relative))
+                )
+
     def test_rejects_unknown_api_javascript_path(self) -> None:
         path = self.site / "api/restricted.js"
         path.write_text('const confidential = "secret";\n', encoding="utf-8")
