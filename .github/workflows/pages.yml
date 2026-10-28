@@ -28,6 +28,10 @@ jobs:
           cache-dependency-path: docs/requirements.txt
       - name: Install Rust 1.99.1
         uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+        # The components rust-toolchain.toml lists, installed here: rustup
+        # adding rustfmt later collides with the action's cargo-fmt.
+        with:
+          components: rustfmt, clippy
       - name: Install documentation dependencies
         run: python -m pip install --disable-pip-version-check -r docs/requirements.txt
       - name: Build and verify site
