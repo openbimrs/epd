@@ -7,10 +7,16 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-28
+
 ### Changed
 
+- **Licence:** `AGPL-3.0-or-later OR LicenseRef-Commercial` (was `MIT` in
+  0.1.1); a commercial licence is available from the copyright holder named in
+  `NOTICE`. See `LICENSING.md`. Historical releases remain under their
+  published MIT terms, and third-party material retains its own terms. Both
+  crates ship `LICENSE`, `NOTICE` and `LICENSES/LicenseRef-Commercial.txt`.
 - Raise MSRV to Rust 1.99.
-- Relicensed repository-authored work from MIT to `AGPL-3.0-or-later`; historical releases remain under their published MIT terms, and third-party material retains its own terms.
 
 ### Added
 
@@ -69,6 +75,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Added standalone documentation, CI, package verification, and explicit
   format-boundary guidance.
 
-[Unreleased]: https://github.com/openbimrs/epd/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/openbimrs/epd/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/openbimrs/epd/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/openbimrs/epd/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/openbimrs/epd/releases/tag/v0.1.0

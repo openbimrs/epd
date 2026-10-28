@@ -59,7 +59,20 @@ RUSTDOC_STATIC_PREFIXES = {
     "settings",
     "src-script",
     "storage",
+    "stringdex",
 }
+RUSTDOC_SEARCH_INDEX_DIRS = (
+    "alias",
+    "crateNames",
+    "desc",
+    "entry",
+    "function",
+    "generic_inverted_index",
+    "name",
+    "normalizedName",
+    "path",
+    "type",
+)
 RUSTDOC_CSS_PREFIXES = {"normalize", "noscript", "rustdoc"}
 RUSTDOC_IMAGE_PREFIXES = {"favicon", "favicon-32x32", "rust-logo"}
 RUSTDOC_FONT_PREFIXES = {
@@ -80,6 +93,7 @@ RUSTDOC_FONT_PREFIXES = {
 }
 RUSTDOC_LICENSE_PREFIXES = {
     "COPYRIGHT",
+    "Fira-LICENSE",
     "FiraSans-LICENSE",
     "LICENSE-APACHE",
     "LICENSE-MIT",
@@ -143,6 +157,14 @@ def is_allowed_api_file(path: PurePosixPath) -> bool:
         search_description is not None
         and search_description.group(1) == search_description.group(2)
         and search_description.group(1) in RUSTDOC_CRATES
+    ):
+        return True
+    # Rustdoc 1.99 shards the search index into content-addressed files.
+    if relative == "api/search.index/root.js":
+        return True
+    if re.fullmatch(
+        r"api/search\.index/(?:(?:%s)/)?[0-9a-f]{10}\.js" % "|".join(RUSTDOC_SEARCH_INDEX_DIRS),
+        relative,
     ):
         return True
     if re.fullmatch(r"api/trait\.impl/(?:[^/]+/)+trait\.[A-Za-z0-9_]+\.js", relative):

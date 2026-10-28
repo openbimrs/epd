@@ -149,4 +149,6 @@ conformance evidence and update the status table without overstating coverage.
 
 ## License
 
-AGPL-3.0-or-later — see [`LICENSE`](https://github.com/openbimrs/epd/blob/main/LICENSE).
+`AGPL-3.0-or-later OR LicenseRef-Commercial` — see
+[`LICENSING.md`](https://github.com/openbimrs/epd/blob/main/LICENSING.md). A commercial
+licence is available from the copyright holder named in `NOTICE`.

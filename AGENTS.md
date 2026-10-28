@@ -24,8 +24,7 @@ validation, ZIP packages, provider APIs, or a universal ISO XML format.
 ```bash
 ./scripts/gate.sh
 cargo test --workspace
-cargo package -p openbim-epd
-cargo package -p openbim-ilcd-epd
+cargo package -p openbim-epd -p openbim-ilcd-epd
 python -m pip install -r docs/requirements.txt
 ./scripts/build-docs.sh
 ```
