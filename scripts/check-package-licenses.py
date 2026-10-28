@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Verify that each generated crate carries the exact project AGPL notice."""
+"""Verify that each generated crate carries the exact project licence texts and
+notice, and declare the dual-licence expression."""
 
 from __future__ import annotations
 
@@ -10,7 +11,9 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PROJECT_LICENSE = (ROOT / "LICENSE").read_bytes()
+SHIPPED = ("LICENSE", "NOTICE", "LICENSES/LicenseRef-Commercial.txt")
+ROOT_FILES = {name: (ROOT / name).read_bytes() for name in SHIPPED}
+EXPRESSION = "AGPL-3.0-or-later OR LicenseRef-Commercial"
 PACKAGES = (ROOT / "openbim-epd", ROOT / "openbim-ilcd-epd")
 TARGET_DIR = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target"))
 if not TARGET_DIR.is_absolute():
@@ -33,16 +36,23 @@ def main() -> None:
         if not archive.is_file():
             fail(f"missing package archive: {archive}")
 
-        with tarfile.open(archive, mode="r:gz") as packaged:
-            expected_member = f"{archive_root}/LICENSE"
-            members = [member for member in packaged.getmembers() if member.name == expected_member]
-            if len(members) != 1 or not members[0].isfile():
-                fail(f"{archive.name} must contain exactly one regular {expected_member}")
-            extracted = packaged.extractfile(members[0])
-            if extracted is None or extracted.read() != PROJECT_LICENSE:
-                fail(f"{archive.name} license does not match repository LICENSE")
+        if package["license"] != EXPRESSION:
+            fail(f"{name} must declare license = {EXPRESSION!r}")
 
-    print(f"verified exact AGPL-3.0-or-later license in {len(PACKAGES)} crate archives")
+        with tarfile.open(archive, mode="r:gz") as packaged:
+            for shipped, expected in ROOT_FILES.items():
+                expected_member = f"{archive_root}/{shipped}"
+                members = [member for member in packaged.getmembers() if member.name == expected_member]
+                if len(members) != 1 or not members[0].isfile():
+                    fail(f"{archive.name} must contain exactly one regular {expected_member}")
+                extracted = packaged.extractfile(members[0])
+                if extracted is None or extracted.read() != expected:
+                    fail(f"{archive.name} {shipped} does not match the repository root")
+            packaged_manifest = packaged.extractfile(f"{archive_root}/Cargo.toml")
+            if packaged_manifest is None or tomllib.loads(packaged_manifest.read().decode("utf-8"))["package"]["license"] != EXPRESSION:
+                fail(f"{archive.name} Cargo.toml has an unexpected license expression")
+
+    print(f"verified exact dual-licence texts and expression in {len(PACKAGES)} crate archives")
 
 
 if __name__ == "__main__":
